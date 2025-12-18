@@ -1,21 +1,36 @@
 const board = document.querySelector('.board');
-const blockHeight = 50;
-const blockWidth = 50;
+
 const startButton = document.querySelector('.btn-start');
 const modal = document.querySelector('.modal');
 const startGameModal = document.querySelector('.start-game');
 const gameOverModal = document.querySelector('.game-over');
 const restartButton = document.querySelector('.btn-restart');
 
+const highScroreElement = document.querySelector('#high-score');
+const scoreElement = document.querySelector('#score');
+const timeElement = document.querySelector('#time');
+
+const blockHeight = 50;
+const blockWidth = 50;
 
 const cols = Math.floor(board.clientWidth / blockWidth);
 const rows = Math.floor(board.clientHeight / blockHeight);
+
+let highScore = localStorage.getItem("highScore") || 0;
+let score = 0;
+let time = `00:00`;
+
+scoreElement.textContent = score;
+highScroreElement.textContent = highScore;
+timeElement.textContent = time;
 
 const blocks = [];
 let snake = [{ x: 1, y: 3 }];
 
 let direction = 'down';
 let intervalId = null;
+let timerIntervalId = null;
+
 let food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols) };
 
 for (let row = 0; row < rows; row++) {
@@ -23,7 +38,7 @@ for (let row = 0; row < rows; row++) {
         const block = document.createElement('div');
         block.classList.add('block');
         board.appendChild(block);
-        block.innerText = `${row},${col}`;
+        // block.innerText = `${row},${col}`;
         blocks[`${row},${col}`] = block;
     }
 }
@@ -64,6 +79,15 @@ function render() {
         blocks[`${food.x},${food.y}`].classList.add('food');
 
         snake.unshift(head);
+
+        score += 10;
+        scoreElement.textContent = score;
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("highScore", highScore.toString());
+            highScroreElement.textContent = highScore;
+        }
     }
 
     snake.forEach(segment => {
@@ -86,6 +110,20 @@ function render() {
 startButton.addEventListener("click", () => {
     modal.style.display = "none";
     intervalId = setInterval(() => { render() }, 300);
+    timerIntervalId = setInterval(() => {
+        let [min, sec] = time.split(":").map(Number);
+
+        if(sec == 59) {
+            min += 1;
+            sec = 0;
+        }
+        else {
+            sec += 1;
+        }
+
+        time = `${min}:${sec}`;
+        timeElement.textContent = time;
+    }, 1000)
 })
 
 
@@ -96,6 +134,8 @@ function restartGame() {
     snake.forEach(segment => {
         console.log(blocks[`${segment.x},${segment.y}`].classList.remove('fill'));
     })
+    score = 0
+    time = `00-00`
 
     modal.style.display = "none";
     snake = [{ x: 1, y: 3 }];

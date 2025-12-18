@@ -57,7 +57,6 @@ main section .infos .info {
   border-radius: var(--border-radius-sm);
 }
 main section .board {
-  border: 1px solid var(--border-prmary-color);
   flex-grow: 1;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
@@ -65,6 +64,7 @@ main section .board {
 }
 main section .board .block {
   border: 1px solid var(--border-prmary-color);
+  border-radius: 30%;
 }
 main section .board .fill {
   background-color: var(--bg-fill-color);
